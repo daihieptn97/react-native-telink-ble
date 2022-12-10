@@ -1,22 +1,25 @@
-import { NativeModules, Platform } from 'react-native';
+import {
+  EventSubscriptionVendor,
+  NativeEventEmitter,
+  NativeModule,
+  NativeModules,
+  Platform,
+} from 'react-native';
+import { RNTelinkBle } from './RNTelinkBle';
 
-const LINKING_ERROR =
-  `The package 'react-native-telink-ble' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+const TelinkBle: RNTelinkBle & EventSubscriptionVendor & NativeModule =
+  NativeModules.TelinkBle;
 
-const TelinkBle = NativeModules.TelinkBle
-  ? NativeModules.TelinkBle
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
+TelinkBle.eventEmitter = new NativeEventEmitter(TelinkBle);
 
-export function multiply(a: number, b: number): Promise<number> {
-  return TelinkBle.multiply(a, b);
+Object.setPrototypeOf(TelinkBle, RNTelinkBle.prototype);
+
+if (Platform.OS === 'ios') {
+  TelinkBle.setDelegateForIOS();
 }
+
+export default TelinkBle;
+export type { DeviceInfo } from './DeviceInfo';
+export * from './helpers/native';
+export type { HSL } from './HSL';
+export { RNTelinkBle };

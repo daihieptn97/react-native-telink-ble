@@ -25,6 +25,9 @@ target 'TelinkBleExample' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+  
+  pod "TelinkSigMeshLib", :path => "../.."
+  pod "react-native-telink-ble",      :path => "../.."
 
   target 'TelinkBleExampleTests' do
     inherit! :complete

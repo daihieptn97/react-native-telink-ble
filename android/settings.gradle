@@ -1,0 +1,2 @@
+include(":TelinkBleMeshLib")
+project(":TelinkBleMeshLib").projectDir = new File("./TelinkBleMeshLib")

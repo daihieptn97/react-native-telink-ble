@@ -1,6 +1,6 @@
 package com.react.telink.ble
 
-import supportedDeviceTypes
+import com.react.telink.ble.supportedDeviceTypes
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

@@ -87,7 +87,7 @@ typedef enum : NSUInteger {
     _bearer = SigBearer.share;
     
     _writeOTAInterval = 0.006;
-    _readTimeoutInterval = 5.0;
+    _readTimeoutInterval = 10.0;
     
     _currentUUID = @"";
     _currentIndex = 0;
@@ -382,7 +382,7 @@ typedef enum : NSUInteger {
             //注意：index=0与index=1之间的时间间隔修改为300ms，让固件有充足的时间进行ota配置。
             if (weakSelf.otaIndex == 0) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf performSelector:@selector(sendPartDataAvailableIOS11) withObject:nil afterDelay:0.3];
+                    [weakSelf performSelector:@selector(sendPartDataAvailableIOS11) withObject:nil afterDelay:0.7];
                 });
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{

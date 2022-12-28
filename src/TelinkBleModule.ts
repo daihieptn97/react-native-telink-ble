@@ -204,6 +204,16 @@ export abstract class TelinkBleModule {
   ): Promise<string>;
 
   /**
+   * Handle OTA Device by mac device
+   *
+   */
+  public abstract otaDeviceByMacAddress(
+    meshAddress: number,
+    filePath: string,
+    macForIos: string
+  ): Promise<string>;
+
+  /**
    * Get Mesh Network for QR Scan
    *
    */

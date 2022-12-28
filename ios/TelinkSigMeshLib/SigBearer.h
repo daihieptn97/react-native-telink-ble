@@ -122,6 +122,8 @@ typedef void(^SendPacketsFinishCallback)(void);
 /// 断开一个mesh网络的连接，切换不同的mesh网络时使用。
 - (void)stopMeshConnectWithComplete:(nullable stopMeshConnectResultBlock)complete;
 
+- (void)stopAutoConnect;
+
 @end
 
 NS_ASSUME_NONNULL_END

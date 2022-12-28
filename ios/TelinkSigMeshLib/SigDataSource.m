@@ -1194,7 +1194,9 @@
 
 - (SigNodeModel *)getNodeWithUUID:(NSString *)uuid{
     NSArray *nodes = [NSArray arrayWithArray:_nodes];
+	NSLog(@"DEBUG123 getNodeWithUUID %lu", (unsigned long)nodes.count);
     for (SigNodeModel *model in nodes) {
+		NSLog(@"DEBUG123 getNodeWithUUID mac: %@ - UUID: %@", model.macAddress,  model.peripheralUUID);
         if ([model.peripheralUUID isEqualToString:uuid]) {
             return model;
         }

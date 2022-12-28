@@ -156,6 +156,7 @@
 }
 
 - (void)stopScan {
+	NSLog(@"DEBUG123 stopScan Bluetooth");
     [self.scanServiceUUIDs removeAllObjects];
     self.scanPeripheralUUID = nil;
     self.bluetoothScanPeripheralCallback = nil;
@@ -605,7 +606,14 @@
     if (shouldReturn) {
         return;
     }
-    
+
+	SigNodeModel *node = [SigDataSource.share getNodeWithUUID:peripheral.identifier.UUIDString];
+	NSLog(@"DEBUG123 didDiscoverPeripheral %@ - %@", node, peripheral.identifier.UUIDString);
+	if(node == nil){
+		return;
+	}
+
+
     SigScanRspModel *scanRspModel = [[SigScanRspModel alloc] initWithPeripheral:peripheral advertisementData:advertisementData];
     
     if ([self.delegate respondsToSelector:@selector(needToBeFilteredNodeWithSigScanRspModel:provisioned:peripheral:advertisementData:RSSI:)]) {
@@ -621,7 +629,7 @@
 //    }
     //=================test==================//
 
-//    TeLogInfo(@"discover RSSI:%@ uuid:%@ mac：%@ state=%@ advertisementData=%@",RSSI,peripheral.identifier.UUIDString,scanRspModel.macAddress,provisionAble?@"1827":@"1828",advertisementData);
+    TeLogInfo(@"discover RSSI:%@ uuid:%@ mac：%@ state=%@ advertisementData=%@",RSSI,peripheral.identifier.UUIDString,scanRspModel.macAddress,provisionAble?@"1827":@"1828",advertisementData);
     BOOL shouldDelay = scanRspModel.macAddress == nil || scanRspModel.macAddress.length == 0;
     if (shouldDelay && self.waitScanRseponseEnabel) {
         TeLogVerbose(@"this node uuid=%@ has not MacAddress, dalay and return.",peripheral.identifier.UUIDString);
@@ -671,6 +679,49 @@
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(nullable NSError *)error {
     TeLogInfo(@"peripheral=%@,error=%@",peripheral,error);
+
+	NSLog(@"DEBUG123 didDisconnectPeripheral %@", error );
+
+//	UIViewController *viewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+//	if ( viewController.presentedViewController && !viewController.presentedViewController.isBeingDismissed ) {
+//		viewController = viewController.presentedViewController;
+//	}
+//
+//	UIAlertController * alert = [UIAlertController
+//								 alertControllerWithTitle:@"Thông báo"
+//								 message:[NSString stringWithFormat:@"Ngắt kết nối tới thiết bị \n %@", error]
+//								 preferredStyle:UIAlertControllerStyleAlert];
+//
+//
+//
+//	UIAlertAction* yesButton = [UIAlertAction
+//								actionWithTitle:@"Ok"
+//								style:UIAlertActionStyleDefault
+//								handler:^(UIAlertAction * action) {
+//		//Handle your yes please button action here
+//	}];
+//
+//
+//	[alert addAction:yesButton];
+//
+//
+//
+//
+//	NSLayoutConstraint *constraint = [NSLayoutConstraint
+//									  constraintWithItem:alert.view
+//									  attribute:NSLayoutAttributeHeight
+//									  relatedBy:NSLayoutRelationLessThanOrEqual
+//									  toItem:nil
+//									  attribute:NSLayoutAttributeNotAnAttribute
+//									  multiplier:1
+//									  constant:viewController.view.frame.size.height*2.0f];
+//
+//	[alert.view addConstraint:constraint];
+//	[viewController presentViewController:alert animated:YES completion:^{}];
+
+
+
+
     if ([peripheral isEqual:self.currentPeripheral]) {
         [self connectPeripheralFail];
         [self cancelConnectPeripheralFinish];

@@ -5,6 +5,7 @@
 #import "DemoCommand.h"
 #import "NSString+extension.h"
 #import "NSData+Conversion.h"
+#import "SigDataSource.h"
 
 @implementation TelinkBle
 
@@ -267,6 +268,7 @@ RCT_EXPORT_METHOD(otaDevice:(nonnull NSNumber*)meshAddress
     //
     SigNodeModel *model = [[SigNodeModel alloc] init];
     model.address =  meshAddress.intValue;
+	
     NSLog(@"mesh Address %04X", meshAddress.intValue);
     NSData *localData = [self getDataWithBinName:filePath];
 
@@ -300,6 +302,63 @@ RCT_EXPORT_METHOD(otaDevice:(nonnull NSNumber*)meshAddress
 
 }
 
+
+
+
+RCT_EXPORT_METHOD(otaDeviceByMacAddress:(nonnull NSNumber*)meshAddress
+				  filePath:(NSString*)filePath
+				  mac:(NSString *)mac
+				  resolve:(RCTPromiseResolveBlock)resolve
+				  rejecter:(RCTPromiseRejectBlock)reject)
+{
+
+	SigNodeModel *model = [[SigNodeModel alloc] init];
+	model.address =  meshAddress.intValue;
+	model.macAddress = mac;
+
+	milestone = 0.0;
+
+	[SigDataSource.share addAndSaveNodeToMeshNetworkWithDeviceModel:model];
+
+	NSLog(@"mesh Address %04X", meshAddress.intValue);
+	NSData *localData = [self getDataWithBinName:filePath];
+
+	if (localData) {
+		resolve(@"file ok");
+	} else {
+		reject(@"ota_failure", @"OTA Device Failure", nil);
+	}
+
+
+	__weak typeof(self) weakSelf = self;
+
+	BOOL result = [OTAManager.share startOTAWithOtaData:localData models:@[model] singleSuccessAction:^(SigNodeModel *device) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[weakSelf otaSuccessAction];
+		});
+	} singleFailAction:^(SigNodeModel *device) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[weakSelf otaFailAction];
+		});
+	} singleProgressAction:^(float progress) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[weakSelf otaProgressAction:progress];
+		});
+	} finishAction:^(NSArray<SigNodeModel *> *successModels, NSArray<SigNodeModel *> *fileModels) {
+		TeLogDebug(@"");
+	}];
+
+	TeLogDebug(@"result = %d",result);
+
+
+}
+
+
+RCT_EXPORT_METHOD(stopAutoConnect2){
+	[SigBearer.share startMeshConnectWithComplete:nil];
+	[SigBearer.share stopAutoConnect];
+}
+
 - (void)otaSuccessAction{
     [self sendEventWithName:EVENT_TYPE_OTA_SUCCESS body: @{
         @"description": @"ota success",
@@ -309,7 +368,7 @@ RCT_EXPORT_METHOD(otaDevice:(nonnull NSNumber*)meshAddress
     NSLog(@"ota success");
 
     [SigBearer.share startMeshConnectWithComplete:nil];
-
+	[SigBearer.share stopAutoConnect];
     TeLogVerbose(@"otaSuccess");
 }
 
@@ -334,8 +393,8 @@ float milestone = 0;
 - (void)otaProgressAction:(float)progress{
 
     float diff = progress - milestone;
-
-    if (diff > 1) {
+	NSLog(@"DEBUG123 --------------------------------- %0.1f - progress: %0.1f - milestone:  %0.1f", diff, progress, milestone);
+    if (diff >= 1) {
         milestone = milestone + 1;
 
         [self sendEventWithName:EVENT_TYPE_OTA_PROGRESS body: @{
@@ -348,7 +407,7 @@ float milestone = 0;
 
     NSString *tips = [NSString stringWithFormat:@"OTA:%.1f%%", progress];
 
-    if (progress == 100) {
+    if (progress == 100.0) {
         tips = [tips stringByAppendingString:@",reboot..."];
     }
 

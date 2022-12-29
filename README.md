@@ -86,6 +86,15 @@ Add the following privacy statements to Info.plist:
 <string>App needs Bluetooth permission to scan, connect and control BLE devices</string>
 ```
 
+### fix ts: 
+```
+npx react-native-builder-bob@latest init
+```
+
+```
+yarn bob build
+```
+
 ## Documentation
 
 Docs available at: [https://docs.thanhtunguet.info/react-native-telink-ble/](https://docs.thanhtunguet.info/react-native-telink-ble/)

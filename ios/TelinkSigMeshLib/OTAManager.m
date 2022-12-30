@@ -86,7 +86,7 @@ typedef enum : NSUInteger {
 - (void)initData{
     _bearer = SigBearer.share;
     
-    _writeOTAInterval = 0.00006;
+    _writeOTAInterval = 0.006;
     _readTimeoutInterval = 10.0;
     
     _currentUUID = @"";

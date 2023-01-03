@@ -353,7 +353,7 @@
 
 
     SigNodeModel *node = [SigDataSource.share getNodeWithUUID:self.peripheral.identifier.UUIDString];
-	NSLog(@"DEBUG123  self.peripheral.identifier.UUIDString: %@" , self.peripheral.identifier.UUIDString);
+	NSLog(@"DEBUG123  self.peripheral.identifier.UUIDString: %@ name deivce: %@" , self.peripheral.identifier.UUIDString, self.peripheral.name);
 
 
     if (node != nil) {
@@ -404,9 +404,9 @@
 		}];
 		_isOpened = YES;
     } else {
+//		SigScanRspModel *scanModel = [SigDataSource.share getScanRspModelWithUUID:self.peripheral.identifier.UUIDString];
+//		TeLogDebug(@"start connected scanModel.macAddress=%@", scanModel.macAddress);
 
-		//        SigScanRspModel *scanModel = [SigDataSource.share getScanRspModelWithUUID:self.peripheral.identifier.UUIDString];
-		//        TeLogDebug(@"start connected scanModel.macAddress=%@",self.peripheral.identifier.);
     }
 
 }

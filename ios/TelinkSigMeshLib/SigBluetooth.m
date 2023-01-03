@@ -28,6 +28,8 @@
 //
 
 #import "SigBluetooth.h"
+#import "CBPeripheral+Extensions.h"
+#import "NSData+Conversion.h"
 
 @interface SigBluetooth ()<CBCentralManagerDelegate, CBPeripheralDelegate>
 @property (nonatomic,strong) CBCentralManager *manager;
@@ -560,6 +562,7 @@
     }
 }
 
+
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *, id> *)advertisementData RSSI:(NSNumber *)RSSI {
     // 将127修正为-90，防止APP扫描不到设备。
     if (RSSI.intValue == 127) {
@@ -608,10 +611,34 @@
     }
 
 	SigNodeModel *node = [SigDataSource.share getNodeWithUUID:peripheral.identifier.UUIDString];
-	NSLog(@"DEBUG123 didDiscoverPeripheral %@ - %@", node, peripheral.identifier.UUIDString);
+	NSLog(@"DEBUG123 didDiscoverPeripheral %@ - %@ - name: %@", node, peripheral.identifier.UUIDString, peripheral.name);
+	NSMutableDictionary *dict = [advertisementData mutableCopy];
+	NSString *mac = @"";
+	if(dict != nil) {
+		NSArray *data = [[dict objectForKey:CBAdvertisementDataManufacturerDataKey] toArray];
+
+		for(int i = 7; i > 1; i--){
+			NSString *dec = [data objectAtIndex:i];
+			long dec1 = (long )[dec integerValue];
+			NSString *hex = [NSString stringWithFormat:@"%02lX", dec1];
+			mac = [mac stringByAppendingFormat:@"%@", hex];
+		}
+//		NSLog(@"DEBUG1233 mac = %@ - name= %@",mac , peripheral.name);
+	}
+
+
+	if(node == nil){
+		node = [SigDataSource.share getNodeWithMacManufacturerData:mac];
+		if(node != nil) {
+			NSLog(@"DEBUG123 getNodeWithMacManufacturerData ok %@", mac);
+		}
+	}
+
+
 	if(node == nil){
 		return;
 	}
+	NSLog(@"DEBUG12333 %@ mac: %@ - macCompare: %@", node.name, node.macAddress , mac);
 
 
     SigScanRspModel *scanRspModel = [[SigScanRspModel alloc] initWithPeripheral:peripheral advertisementData:advertisementData];

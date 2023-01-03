@@ -308,6 +308,7 @@ RCT_EXPORT_METHOD(otaDevice:(nonnull NSNumber*)meshAddress
 RCT_EXPORT_METHOD(otaDeviceByMacAddress:(nonnull NSNumber*)meshAddress
 				  filePath:(NSString*)filePath
 				  mac:(NSString *)mac
+//				  nameBluetoothDevice:(NSString *)nameBluetoothDevice
 				  resolve:(RCTPromiseResolveBlock)resolve
 				  rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -315,6 +316,8 @@ RCT_EXPORT_METHOD(otaDeviceByMacAddress:(nonnull NSNumber*)meshAddress
 	SigNodeModel *model = [[SigNodeModel alloc] init];
 	model.address =  meshAddress.intValue;
 	model.macAddress = mac;
+//	model.name = nameBluetoothDevice;
+
 
 	milestone = 0.0;
 

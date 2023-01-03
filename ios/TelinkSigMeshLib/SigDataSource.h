@@ -179,6 +179,8 @@
 - (SigAppkeyModel *)getAppkeyModelWithAppkeyIndex:(NSInteger)appkeyIndex;
 
 - (SigNodeModel *)getNodeWithUUID:(NSString *)uuid;
+- (SigNodeModel *)getNodeWithName:(NSString *)name;
+- (SigNodeModel *)getNodeWithMacManufacturerData:(NSString *)name;
 - (SigNodeModel *)getNodeWithAddress:(UInt16)address;
 - (SigNodeModel *)getDeviceWithMacAddress:(NSString *)macAddress;
 - (SigNodeModel *)getCurrentConnectedNode;

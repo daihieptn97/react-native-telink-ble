@@ -497,6 +497,9 @@
 - (void)configData{
     NSData *locationData = [self getLocationMeshData];
     BOOL exist = locationData.length > 0;
+
+
+
     if (!exist) {
         //don't exist mesh.json, create and init mesh
         [self initMeshData];
@@ -513,6 +516,9 @@
             [self saveLocationData];
         }
     }
+
+	NSLog(@"DEBUG123 configData");
+
     //check provisioner
     [self checkExistLocationProvisioner];
     //init SigScanRspModel list
@@ -616,7 +622,6 @@
     
     [_nodes addObject:node];
 }
-
 
 - (void)deleteNodeFromMeshNetworkWithDeviceAddress:(UInt16)deviceAddress{
     @synchronized(self) {
@@ -784,6 +789,7 @@
 
 ///Special handling: load the uuid and MAC mapping relationship.
 - (void)loadScanList{
+	NSLog(@"DEBUG123 loadScanList");
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *data = [defaults objectForKey:kScanList_key];
     if (data) {
@@ -792,6 +798,11 @@
             [self.scanList addObjectsFromArray:array];
         }
     }
+
+	for (int i = 0; i < self.scanList.count; i++) {
+		NSLog(@"DEBUG1234 self.scanList= %@ - %@ - %hu<-" , [[self.scanList objectAtIndex:i] uuid], [[self.scanList objectAtIndex:i] macAddress], [[self.scanList objectAtIndex:i] address]);
+	}
+
 }
 
 - (SigNodeModel *)getDeviceWithAddress:(UInt16)address{
@@ -1205,29 +1216,17 @@
     return nil;
 }
 
-
-- (SigNodeModel *)getNodeWithName:(NSString *)name{
-	NSArray *nodes = [NSArray arrayWithArray:_nodes];
-//	NSLog(@"DEBUG123 getNodeWithUUID %lu", (unsigned long)nodes.count);
-	for (SigNodeModel *model in nodes) {
-//		NSLog(@"DEBUG123 getNodeWithUUID mac: %@ - UUID: %@ model name: %@ / name : %@", model.macAddress,  model.peripheralUUID, model.name, name);
-		if ([model.name isEqualToString:name]) {
-			return model;
-		}
-	}
-	return nil;
-}
-
 - (SigNodeModel *)getNodeWithMacManufacturerData:(NSString *)mac{
 	NSArray *nodes = [NSArray arrayWithArray:_nodes];
 	for (SigNodeModel *model in nodes) {
-//		NSLog(@"DEBUG1233 model.macAddress=%@ - mac:%@", model.macAddress, mac);
+//		NSLog(@"DEBUG1233 model.macAddress=%@ - mac:%@ - uuid= %@", model.macAddress, mac , model.peripheralUUID );
 		if ([model.macAddress isEqualToString:mac]) {
 			return model;
 		}
 	}
 	return nil;
 }
+
 
 - (SigNodeModel *)getNodeWithAddress:(UInt16)address{
     NSArray *nodes = [NSArray arrayWithArray:_nodes];

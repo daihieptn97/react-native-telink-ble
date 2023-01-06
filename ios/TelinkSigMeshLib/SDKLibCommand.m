@@ -3010,6 +3010,7 @@
         [addresses addObject:@(node.address)];
     }
 
+	NSLog(@"DEBUG123 setFilterForProvisioner STEP1");
     // Add All Nodes group address.
     [addresses addObject:@(kMeshAddress_allNodes)];
     // Submit.
@@ -3068,6 +3069,7 @@
                     TeLogVerbose(@"add address,isResponseAll=%d,error:%@",isResponseAll,error);
                     if (failCallback) {
                         failCallback(error==nil,error);
+						NSLog(@"DEBUG123 setFilterForProvisioner failCallback1 %@", error);
                     }
                 }];
             });
@@ -3075,6 +3077,7 @@
             TeLogVerbose(@"filter type,isResponseAll=%d,error:%@",isResponseAll,error);
             if (error != nil) {
                 if (failCallback) {
+					NSLog(@"DEBUG123 setFilterForProvisioner failCallback %@", error);
                     failCallback(NO,error);
                 }
             }

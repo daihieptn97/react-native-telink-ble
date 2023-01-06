@@ -118,6 +118,9 @@ typedef enum : NSUInteger {
  */
 - (BOOL)startOTAWithOtaData:(NSData *)otaData models:(NSArray <SigNodeModel *>*)models singleSuccessAction:(singleDeviceCallBack)singleSuccessAction singleFailAction:(singleDeviceCallBack)singleFailAction singleProgressAction:(singleProgressCallBack)singleProgressAction finishAction:(finishCallBack)finishAction{
     if (_OTAing) {
+//		[SigBearer.share stopMeshConnectWithComplete:nil];
+//		[SigBearer.share stopAutoConnect];
+		[self stopOTA];
         TeLogInfo(@"OTAing, can't call repeated.");
         return NO;
     }

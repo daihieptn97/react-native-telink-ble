@@ -281,6 +281,8 @@ RCT_EXPORT_METHOD(otaDevice:(nonnull NSNumber*)meshAddress
 
     __weak typeof(self) weakSelf = self;
 
+	[OTAManager.share stopOTA];
+
     BOOL result = [OTAManager.share startOTAWithOtaData:localData models:@[model] singleSuccessAction:^(SigNodeModel *device) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf otaSuccessAction];
@@ -308,7 +310,6 @@ RCT_EXPORT_METHOD(otaDevice:(nonnull NSNumber*)meshAddress
 RCT_EXPORT_METHOD(otaDeviceByMacAddress:(nonnull NSNumber*)meshAddress
 				  filePath:(NSString*)filePath
 				  mac:(NSString *)mac
-//				  nameBluetoothDevice:(NSString *)nameBluetoothDevice
 				  resolve:(RCTPromiseResolveBlock)resolve
 				  rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -316,8 +317,6 @@ RCT_EXPORT_METHOD(otaDeviceByMacAddress:(nonnull NSNumber*)meshAddress
 	SigNodeModel *model = [[SigNodeModel alloc] init];
 	model.address =  meshAddress.intValue;
 	model.macAddress = mac;
-//	model.name = nameBluetoothDevice;
-
 
 	milestone = 0.0;
 
@@ -358,8 +357,9 @@ RCT_EXPORT_METHOD(otaDeviceByMacAddress:(nonnull NSNumber*)meshAddress
 
 
 RCT_EXPORT_METHOD(stopAutoConnect2){
-	[SigBearer.share startMeshConnectWithComplete:nil];
+	[SigBearer.share stopMeshConnectWithComplete:nil];
 	[SigBearer.share stopAutoConnect];
+	[OTAManager.share stopOTA];
 }
 
 - (void)otaSuccessAction{
@@ -372,6 +372,8 @@ RCT_EXPORT_METHOD(stopAutoConnect2){
 
     [SigBearer.share startMeshConnectWithComplete:nil];
 	[SigBearer.share stopAutoConnect];
+	[OTAManager.share stopOTA];
+
     TeLogVerbose(@"otaSuccess");
 }
 
@@ -382,22 +384,24 @@ RCT_EXPORT_METHOD(stopAutoConnect2){
     }];
 
     NSLog(@"ota fail");
-
-    [SigBearer.share startMeshConnectWithComplete:nil];
+	[OTAManager.share stopOTA];
+    [SigBearer.share stopMeshConnectWithComplete:nil];
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSObject cancelPreviousPerformRequestsWithTarget:self];
     });
 
+	[self stopAutoConnect2];
+
     TeLogVerbose(@"otaFail");
 }
 
-float milestone = 0;
+float milestone = 0.0;
 
 - (void)otaProgressAction:(float)progress{
 
     float diff = progress - milestone;
 	NSLog(@"DEBUG123 --------------------------------- %0.1f - progress: %0.1f - milestone:  %0.1f", diff, progress, milestone);
-    if (diff >= 1) {
+    if (diff >= 1 || milestone < 1.0) {
         milestone = milestone + 1;
 
         [self sendEventWithName:EVENT_TYPE_OTA_PROGRESS body: @{
@@ -412,6 +416,7 @@ float milestone = 0;
 
     if (progress == 100.0) {
         tips = [tips stringByAppendingString:@",reboot..."];
+//		[OTAManager.share stopOTA];
     }
 
     NSLog(@"ota progress %.2f", progress);

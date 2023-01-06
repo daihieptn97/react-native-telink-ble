@@ -31,6 +31,8 @@
 #import "CBPeripheral+Extensions.h"
 #import "NSData+Conversion.h"
 
+
+
 @interface SigBluetooth ()<CBCentralManagerDelegate, CBPeripheralDelegate>
 @property (nonatomic,strong) CBCentralManager *manager;
 @property (nonatomic,strong,nullable) CBPeripheral *currentPeripheral;
@@ -165,9 +167,12 @@
     if (self.manager.isScanning) {
         TeLogVerbose(@"");
         [self.manager stopScan];
+
     } else {
         TeLogVerbose(@"Bluetooth is not scanning.")
     }
+
+
 }
 
 - (void)connectPeripheral:(CBPeripheral *)peripheral timeout:(NSTimeInterval)timeout resultBlock:(bleConnectPeripheralCallback)block {
@@ -562,7 +567,6 @@
     }
 }
 
-
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *, id> *)advertisementData RSSI:(NSNumber *)RSSI {
     // 将127修正为-90，防止APP扫描不到设备。
     if (RSSI.intValue == 127) {
@@ -611,7 +615,14 @@
     }
 
 	SigNodeModel *node = [SigDataSource.share getNodeWithUUID:peripheral.identifier.UUIDString];
-	NSLog(@"DEBUG123 didDiscoverPeripheral %@ - %@ - name: %@", node, peripheral.identifier.UUIDString, peripheral.name);
+//	NSLog(@"DEBUG123 didDiscoverPeripheral %@ - %@", node, peripheral.identifier.UUIDString);
+
+
+
+//	SigNodeModel *node  = nil;
+
+
+
 	NSMutableDictionary *dict = [advertisementData mutableCopy];
 	NSString *mac = @"";
 	if(dict != nil) {
@@ -623,10 +634,11 @@
 			NSString *hex = [NSString stringWithFormat:@"%02lX", dec1];
 			mac = [mac stringByAppendingFormat:@"%@", hex];
 		}
-//		NSLog(@"DEBUG1233 mac = %@ - name= %@",mac , peripheral.name);
+		//		NSLog(@"DEBUG1233 mac = %@ - name= %@",mac , peripheral.name);
 	}
 
-
+//	node = [SigDataSource.share getNodeWithMacManufacturerData:mac];
+	
 	if(node == nil){
 		node = [SigDataSource.share getNodeWithMacManufacturerData:mac];
 		if(node != nil) {
@@ -635,14 +647,21 @@
 	}
 
 
+
+
+
+
 	if(node == nil){
 		return;
 	}
-	NSLog(@"DEBUG12333 %@ mac: %@ - macCompare: %@", node.name, node.macAddress , mac);
 
+	NSLog(@"DEBUG123 didDiscoverPeripheral %@ - %@ - name: %@", [peripheral asDictionary], peripheral.identifier.UUIDString, peripheral.name);
 
     SigScanRspModel *scanRspModel = [[SigScanRspModel alloc] initWithPeripheral:peripheral advertisementData:advertisementData];
-    
+
+	TeLogInfo(@"discover RSSI:%@ uuid:%@ mac：%@ state=%@ advertisementData=%@",RSSI,peripheral.identifier.UUIDString,scanRspModel.macAddress,provisionAble?@"1827":@"1828",advertisementData);
+	[SigDataSource.share updateScanRspModelToDataSource:scanRspModel];
+
     if ([self.delegate respondsToSelector:@selector(needToBeFilteredNodeWithSigScanRspModel:provisioned:peripheral:advertisementData:RSSI:)]) {
         BOOL result = [self.delegate needToBeFilteredNodeWithSigScanRspModel:scanRspModel provisioned:unProvisionAble peripheral:peripheral advertisementData:advertisementData RSSI:RSSI];
         if (result) {
@@ -656,7 +675,7 @@
 //    }
     //=================test==================//
 
-    TeLogInfo(@"discover RSSI:%@ uuid:%@ mac：%@ state=%@ advertisementData=%@",RSSI,peripheral.identifier.UUIDString,scanRspModel.macAddress,provisionAble?@"1827":@"1828",advertisementData);
+//    TeLogInfo(@"discover RSSI:%@ uuid:%@ mac：%@ state=%@ advertisementData=%@",RSSI,peripheral.identifier.UUIDString,scanRspModel.macAddress,provisionAble?@"1827":@"1828",advertisementData);
     BOOL shouldDelay = scanRspModel.macAddress == nil || scanRspModel.macAddress.length == 0;
     if (shouldDelay && self.waitScanRseponseEnabel) {
         TeLogVerbose(@"this node uuid=%@ has not MacAddress, dalay and return.",peripheral.identifier.UUIDString);
@@ -676,8 +695,8 @@
         }
     }
 
-    TeLogInfo(@"discover RSSI:%@ uuid:%@ mac：%@ state=%@ advertisementData=%@",RSSI,peripheral.identifier.UUIDString,scanRspModel.macAddress,provisionAble?@"1827":@"1828",advertisementData);
-    [SigDataSource.share updateScanRspModelToDataSource:scanRspModel];
+//    TeLogInfo(@"discover RSSI:%@ uuid:%@ mac：%@ state=%@ advertisementData=%@",RSSI,peripheral.identifier.UUIDString,scanRspModel.macAddress,provisionAble?@"1827":@"1828",advertisementData);
+//    [SigDataSource.share updateScanRspModelToDataSource:scanRspModel];
     
     if (self.bluetoothScanPeripheralCallback) {
         self.bluetoothScanPeripheralCallback(peripheral,advertisementData,RSSI,provisionAble);
@@ -746,7 +765,7 @@
 //	[alert.view addConstraint:constraint];
 //	[viewController presentViewController:alert animated:YES completion:^{}];
 
-
+//	[OTAManager.share stopOTA];
 
 
     if ([peripheral isEqual:self.currentPeripheral]) {

@@ -1,33 +1,30 @@
-apply plugin: "com.android.library"
-
-repositories {
-    mavenCentral()
-    google()
-    maven { url "https://jitpack.io" }
-}
-
 buildscript {
     repositories {
-        mavenCentral()
         google()
-        maven { url "https://jitpack.io" }
+        mavenCentral()
     }
-
     dependencies {
-        classpath "com.android.tools.build:gradle:4.2.2"
+        classpath 'com.android.tools.build:gradle:8.1.0'
     }
 }
 
+apply plugin: "com.android.library"
+
 android {
-    compileSdkVersion 28
+    namespace "com.telink.ble.mesh.lib"
+    compileSdkVersion 35
 
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 28
+        minSdkVersion 24
+        targetSdkVersion 34
         versionCode 3
         versionName "3.3.2"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {
@@ -47,6 +44,6 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:1.1.0"
     testImplementation "junit:junit:4.12"
-    androidTestImplementation "com.android.support.test:runner:0.5"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:2.2.2"
+    androidTestImplementation "androidx.test:runner:1.5.2"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
 }

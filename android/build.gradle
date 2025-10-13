@@ -8,7 +8,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:7.2.2"
+    classpath "com.android.tools.build:gradle:8.1.0"
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
@@ -34,6 +34,7 @@ def getExtOrIntegerDefault(name) {
 }
 
 android {
+  namespace "com.react.telink.ble"
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
   defaultConfig {
@@ -45,6 +46,9 @@ android {
     release {
       minifyEnabled false
     }
+  }
+buildFeatures {
+    buildConfig true
   }
 
   lintOptions {
